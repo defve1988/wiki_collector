@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style/page.css" />
+    <link rel="stylesheet" href="style/tree_list.css" />
+    <link rel="stylesheet" href="style/toggle_button.css" />
+    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/5.4.55/css/materialdesignicons.min.css" />
+    <title>Document</title>
+</head>
+
+<body style="width: 300px;height: 450px;">
+    <div class="sticky">
+        <h1>Wiki Collector</h1>
+        <div id="tool_buttons" style="margin-left:8px;">
+            <button id="refresh">
+                <i class="mdi mdi-refresh" aria-hidden="true"></i>
+            </button>
+            <button id="list_view" class="btn" value="tree_view">
+                <i class="mdi mdi-format-list-bulleted" aria-hidden="true"></i>
+            </button>
+            <button id="expand_all" class="btn" value="expand_all">
+                <i class="mdi mdi-arrow-expand-down" aria-hidden="true"></i>
+            </button>
+            <button id="show_all" class="btn">
+                <i class="mdi mdi-book-open-page-variant" aria-hidden="true"></i>
+            </button>
+            <button id="export_file" class="btn">
+                <i class="mdi mdi-export" aria-hidden="true"></i>
+            </button>
+        </div>
+        <hr>
+        <div class="wiki_title">
+            <span id="page_title">Wiki Entry</span>
+        </div>
+    </div>
+
+    <div id="loading_text">
+        <span style="color:rgb(100,3,3);">
+            Page is still loading or not a wikiland page...
+        </span>
+    </div>
+
+    <script src="popup.js" charset="utf-8"></script>
+    <script src="utils.js" charset="utf-8"></script>
+
+</body>
+
+</html>

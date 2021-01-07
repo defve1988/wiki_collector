@@ -1,0 +1,44 @@
+{
+    "name": "Wiki Collector",
+    "version": "0.1",
+    "description": "Collect what you have seen in Wiki",
+    "permissions": [
+        "storage",
+        "tabs",
+        "contextMenus",
+        "unlimitedStorage",
+        "downloads"
+    ],
+    "content_scripts": [{
+        "matches": ["*://*.wikiwand.com/*", "*://*.wikipedia.org/*"],
+        "js": ["content.js", "utils.js", "page_structure.js"]
+    }],
+    "background": {
+        "scripts": ["background.js", "utils.js", "exculde_word_list.js"],
+        "persistent": false
+    },
+    "browser_action": {
+        "default_popup": "popup.html",
+        "default_title": "Wiki Collector",
+        "default_icon": {
+            "16": "images/get_started16.png",
+            "32": "images/get_started32.png",
+            "48": "images/get_started48.png",
+            "128": "images/get_started128.png"
+        }
+    },
+    "icons": {
+        "16": "images/get_started16.png",
+        "32": "images/get_started32.png",
+        "48": "images/get_started48.png",
+        "128": "images/get_started128.png"
+    },
+    "commands": {
+        "_execute_browser_action": {
+            "suggested_key": {
+                "default": "Alt+Q"
+            }
+        }
+    },
+    "manifest_version": 2
+}
