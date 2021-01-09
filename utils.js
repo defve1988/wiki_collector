@@ -164,55 +164,62 @@ function update_notes() {
 }
 
 function update_storage(win_url, key = null, content = "") {
-    console.log(win_url, key, content)
-    chrome.storage.local.get(["collected_list", "opened_page", win_url], function (res) {
-        // initalize 
-        if (res.collected_list == undefined) {
-            res.collected_list = []
-        }
-        if (res[win_url] == undefined) {
-            res[win_url] = res.opened_page[win_url]
-        }
+    // console.log(win_url, key, content)
+    var new_content = get_page_details()
 
-        chrome.storage.local.set({
-            [win_url]: res[win_url],
-            collected_list: res.collected_list
-        }, function () {
-            chrome.storage.local.get(["collected_list", "opened_page", win_url], function (res) {
-                // first visit of the page
-                if (!res.collected_list.includes(win_url)) {
-                    res.collected_list.push(win_url)
-                }
-                if (res[win_url] != undefined) {
-                    // if previously the page is not fully loaded
-                    if (res[win_url].content.child.length == 0) {
-                        res[win_url] = res.opened_page[win_url]
+    chrome.runtime.sendMessage({
+        msg: "ready",
+        content: new_content
+    }, function () {
+        chrome.storage.local.get(["collected_list", "opened_page", win_url], function (res) {
+            // initalize 
+            if (res.collected_list == undefined) {
+                res.collected_list = []
+            }
+            if (res[win_url] == undefined) {
+                res[win_url] = res.opened_page[win_url]
+                res.collected_list.push(win_url)
+            }
+            // console.log(1, res[win_url])
+
+            chrome.storage.local.set({
+                [win_url]: res[win_url],
+                collected_list: res.collected_list
+            }, function () {
+                chrome.storage.local.get(["collected_list", "opened_page", win_url], function (res) {
+                    // first visit of the page
+                    if (!res.collected_list.includes(win_url)) {
+                        res.collected_list.push(win_url)
                     }
-                    // update the fields
-                    if (key != null) {
-                        if (key == "notes") {
-                            var textarea = document.getElementById('wiki_collector_notes')
-                            if (textarea != null) {
-                                content = textarea.value
-                            }
-                            res[win_url][key] = content
-                        } else
-                        if (!res[win_url][key].includes(content)) {
-                            res[win_url][key].push(content)
+                    if (res[win_url] != undefined) {
+                        // if previously the page is not fully loaded
+                        if (res[win_url].content.child.length == 0) {
+                            res[win_url] = res.opened_page[win_url]
                         }
-                        console.log(key, " added.")
-                        console.log(res[win_url][key])
+                        // update the fields
+                        if (key != null) {
+                            if (key == "notes") {
+                                var textarea = document.getElementById('wiki_collector_notes')
+                                if (textarea != null) {
+                                    content = textarea.value
+                                }
+                                res[win_url][key] = content
+                            } else {
+                                res[win_url][key].push(content)
+                            }
+                            console.log(key, " added.")
+                            // console.log(res[win_url][key])
+                        }
                     }
-                }
-                // update storage
-                chrome.storage.local.set({
-                    [win_url]: res[win_url],
-                    collected_list: res.collected_list
+                    // update storage
+                    chrome.storage.local.set({
+                        [win_url]: res[win_url],
+                        collected_list: res.collected_list
+                    })
                 })
-            })
-        });
+            });
+        })
     })
-
 }
 
 
@@ -250,6 +257,31 @@ function export_file() {
     });
 }
 
-function upload_file() {
-    alert(1)
+function read_json_file(file) {
+    return new Promise((resolve, reject) => {
+        let reader = new FileReader();
+
+        reader.onload = () => {
+            resolve(reader.result);
+        };
+        reader.onerror = reject;
+        reader.readAsText(file);
+    })
 }
+
+function create_btn(mid_name) {
+    var btn = document.createElement('button')
+    btn.classList.add("btn")
+    btn.classList.add("btn-sm")
+    var icon = document.createElement("i")
+    icon.classList.add("mdi")
+    icon.classList.add(mid_name)
+    icon.setAttribute("aria-hidden", "true")
+    btn.appendChild(icon)
+
+    return btn
+}
+
+
+// todo: 1. switch notebooks, 2. new words, 3. delete entries, 4. how to resume highlited text, 5. fix collect and update
+// note: 1. you need to add listener for element fucntion instead of set "onclick" attributes

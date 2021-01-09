@@ -22,6 +22,11 @@
     display: initial;
 }
 
+button:hover {
+    color: rgb(240, 240, 240);
+    background-color: rgb(150, 150, 150);
+}
+
 html {
     scroll-behavior: smooth;
 }
@@ -32,8 +37,8 @@ header {
     text-align: center;
     font-size: 20px;
     color: white;
+    border-bottom: rgb(187, 187, 187) 1px solid;
 }
-
 
 nav {
     position: sticky;
@@ -108,15 +113,107 @@ footer {
     top: 50%;
     -ms-transform: translateY(-50%);
     transform: translateY(-50%);
-    left: 75%
+    left: 20%
 }
 
 a:visited {
-	color: rgb(0, 78, 122);
+    color: rgb(0, 78, 122);
 }
 
-.fig_caption{
+.fig_caption {
     font-size: 12px;
     color: rgb(100, 100, 100);
     font-family: 'Trebuchet MS', sans-serif;
 }
+
+#collected_list {
+    padding: 0px;
+}
+
+.nav_li {
+    padding: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.nav_li:hover {
+    background-color: rgba(50, 50, 50, 0.5);
+    transition: 0.3s;
+    color: white;
+    transform: translate3d(-3px, 0, 0);
+}
+
+.selected {
+    background-color: rgba(100, 100, 100, 0.5);
+    transition: 0.5s;
+    color: rgb(240, 240, 240);
+    transform: translate3d(-3px, 0, 0);
+}
+
+
+.editor_input {
+    /* border: 1px solid rgb(112, 112, 112); */
+}
+
+.note_text {
+    background-color: rgba(119, 255, 85, 0.7);
+    color: rgb(80, 80, 80);
+    border-radius: 3px;
+    filter: drop-shadow(0 0 0.1rem rgba(150, 150, 150, 0.7));
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    cursor: text;
+}
+
+/* .note_text:hover {
+    filter: drop-shadow(0 0 0.4rem rgba(102, 102, 102, 0.7));
+} */
+
+.highlighted_text {
+    background-color: rgba(255, 255, 0, 0.5);
+    color: rgb(80, 80, 80);
+    border-radius: 10px;
+    filter: drop-shadow(0 0 0.1rem rgba(150, 150, 150, 0.5));
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    display: inline-block;
+    width: auto;
+    max-width: 30%;
+    max-height: 200px;
+    overflow-y: auto;
+    margin: 10px;
+}
+
+.highlighted_text:hover {
+    filter: drop-shadow(0 0 0.4rem rgba(102, 102, 102, 0.5));
+}
+
+
+[contenteditable="true"] {
+    outline: 0px solid transparent;
+    filter: drop-shadow(0 0 0.4rem rgba(102, 102, 102, 0.7));
+}
+
+
+img {
+    filter: drop-shadow(0 0 0.1rem rgba(102, 102, 102, 0.7));
+}
+
+img:hover {
+    filter: drop-shadow(0 0 0.4rem rgba(102, 102, 102, 0.7));
+}
+
+
+/* .img_div{
+    border-radius: 3px;
+    border: 1px solid red;
+    margin-left:10px;
+    filter: drop-shadow(0 0 0.1rem rgba(102, 102, 102, 0.7));
+
+} */

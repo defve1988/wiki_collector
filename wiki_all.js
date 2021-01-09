@@ -1,16 +1,66 @@
 var base_wiki_url = "https://www.wikiwand.com"
 window.onload = function () {
+    // chrome.storage.local.get(["/en/Antonin_Scalia", "collected_list"], function (res) {
+    //     console.log(res)
+    // })
+    add_elements()
     document.getElementById('list_all').addEventListener('click', list_all, false)
     document.getElementById('net_work').addEventListener('click', net_work, false)
     document.getElementById('show_notes').addEventListener('click', show_notes, false)
     document.getElementById('show_figs').addEventListener('click', show_figs, false)
     document.getElementById('upload_file').addEventListener('click', upload_file, false)
     document.getElementById('export_file').addEventListener('click', export_file, false)
+    document.getElementById('app_setting').addEventListener('click', app_setting, false)
+    document.getElementById('app_setting').style.display = "none"
     list_all()
+
+    window.onclick = function (event) {
+        if (event.target == image_modal) {
+            image_modal.style.display = "none";
+        }
+        var class_list = [...event.target.classList]
+        // console.log(class_list)
+
+        if (!class_list.includes("note_text") && !class_list.includes("mdi-pencil") && !class_list.includes("eidt_note_btn")) {
+            var notes = [...document.getElementsByClassName("note_text")]
+            notes.forEach(x => {
+                if (x.textContent.trim() == "") x.parentElement.style.display = "none"
+                x.classList.remove("editor_input")
+                x.setAttribute("contenteditable", "false")
+            })
+        }
+    }
+
     // todo: add some review functions, randomized list
 }
 
-function net_work() {}
+function app_setting() {}
+
+function net_work() {
+    clear_content()
+    
+    var collected_div = document.getElementById("article_container")
+    var svg_div = document.createElement("div")
+    svg_div.classList.add("wiki_content")
+    // svg_div.setAttribute("style","height:100px;width:1000px;")
+    
+    var count_text = document.createElement("div")
+    count_text.id = "total_collected"
+    
+    var svg = document.createElement("svg")
+    collected_div.appendChild(svg_div)
+    svg.id = "network_svg"
+
+    svg_div.appendChild(count_text)
+    svg_div.appendChild(svg)
+    create_graph()
+}
+
+
+
+function upload_file() {
+    document.getElementById('file_selector').click();
+}
 
 function show_notes() {
     chrome.storage.local.get(["collected_list"], function (res) {
@@ -21,6 +71,7 @@ function show_notes() {
             })
             clear_content()
         }
+        // console.log(res.collected_list)
         res.collected_list.forEach(url => {
             var collected_div = document.getElementById("article_container")
             chrome.storage.local.get([url], function (res) {
@@ -36,6 +87,8 @@ function show_notes() {
                     if (highlight != null) entry_div.appendChild(highlight)
                     entry_div.appendChild(document.createElement("hr"))
                 }
+
+                entry_div.id = "entry_" + url
                 collected_div.appendChild(entry_div)
             })
         })
@@ -43,7 +96,6 @@ function show_notes() {
 }
 
 function show_figs() {
-    // todo: switch between gallery layout
     chrome.storage.local.get(["collected_list"], function (res) {
         if (res.collected_list.length > 0) {
             var nothing_text = [...document.getElementsByClassName("nothing_text")]
@@ -62,20 +114,7 @@ function show_figs() {
         res.collected_list.forEach(url => {
             chrome.storage.local.get([url], function (res) {
                 res[url].saved_fig.forEach(f => {
-                    var img_div = document.createElement("div")
-                    img_div.setAttribute("style", "width:auto;text-align:center;")
-                    var img = document.createElement("img")
-                    img.src = f.src
-                    img.addEventListener('click', open_img, false)
-                    img_div.appendChild(img)
-                    var width_height = "width:auto;height:200px;"
-                    if (f.title[0] == "(" || f.title[0] == "{") {
-                        width_height = "width:auto;height:50px;"
-                    }
-                    img.setAttribute("style", width_height + "cursor:pointer;")
-                    img.classList.add("rounded")
-                    img_div.classList.add("p-2")
-                    gallery.appendChild(img_div)
+                    gallery.appendChild(create_img_div(url, f, false))
                 })
             })
             collected_div.appendChild(gallery)
@@ -100,7 +139,6 @@ function list_all() {
             clear_content()
         }
         res.collected_list.forEach(url => {
-            var nav_list = document.getElementById("collected_list")
             var collected_div = document.getElementById("article_container")
             chrome.storage.local.get([url], function (res) {
                 var title = get_title(res[url], url)
@@ -122,15 +160,8 @@ function list_all() {
                 if (highlight != null) entry_div.appendChild(highlight)
                 if (figs != null) entry_div.appendChild(figs)
                 entry_div.appendChild(document.createElement("hr"))
+                entry_div.id = "entry_" + url
                 collected_div.appendChild(entry_div)
-
-                // add to nav list
-                var li = document.createElement("li")
-                var a = document.createElement("a")
-                a.href = "#" + url + "_nav"
-                a.textContent = '- ' + res[url].title
-                li.appendChild(a)
-                nav_list.appendChild(li)
             })
 
         });
@@ -141,44 +172,126 @@ function get_title(content, url) {
     var title = document.createElement('h3')
     title.id = url + "_nav"
     var title_a = document.createElement("a")
+
+    var btn = create_btn("mdi-delete-outline")
+    btn.addEventListener("click", function () {
+        var res = confirm("Delete this entry?")
+        if (res) {
+            chrome.storage.local.remove([url])
+            chrome.storage.local.get(["collected_list"], function (res) {
+                chrome.storage.local.set({
+                        collected_list: res.collected_list.filter(item => item !== url)
+                    },
+                    function () {
+                        var entry_div = document.getElementById("entry_" + url)
+                        entry_div.parentElement.removeChild(entry_div)
+                        create_nav_list()
+                    })
+            })
+        }
+    })
     title_a.textContent = content.title
     title_a.href = base_wiki_url + content.url
     title_a.setAttribute("target", "_blank")
     title.appendChild(title_a)
+    title.appendChild(btn)
+
     return title
 }
 
+
+
 function get_notes(content, url, no_header = false) {
+    var note_div = document.createElement('div')
+
+    var notes_header = document.createElement('div')
+    notes_header.setAttribute("style", "margin-bottom:5px;")
+    notes_header.innerHTML = "<strong>Notes </strong>\n"
+    var edit_btn = create_btn("mdi-pencil")
+    edit_btn.classList.add("eidt_note_btn")
+    edit_btn.addEventListener("click", function () {
+        let notes = document.getElementById("notes_" + url)
+        notes.parentElement.style.display = "block"
+        notes.setAttribute("contenteditable", "true")
+        notes.classList.add("editor_input")
+        notes.focus()
+    })
+
+    notes_header.appendChild(edit_btn)
+
+    var notes_content = document.createElement('div')
     var notes = document.createElement('p')
-    if (no_header) {
-        notes.innerHTML = content.notes
-    } else {
-        notes.innerHTML = "<strong>Notes: </strong>\n" + content.notes
-    }
-    notes.setAttribute("style", "white-space: pre-wrap;")
-    if (content.notes == "" || content.notes == "Edit your note here...") notes = null
-    return notes
+    notes.classList.add("note_text")
+    notes.textContent = content.notes
+    notes.id = "notes_" + url
+    notes.setAttribute("style", "display: inline-block;white-space: pre-wrap;width:100%;")
+    notes.setAttribute("contenteditable", "false")
+    notes.addEventListener("dblclick", function () {
+        let notes = document.getElementById("notes_" + url)
+        notes.setAttribute("contenteditable", "true")
+        notes.classList.add("editor_input")
+    })
+    notes.addEventListener("input", function (inputs) {
+        chrome.storage.local.get([url], function (res) {
+            res[url].notes = inputs.target.textContent
+            chrome.storage.local.set({
+                [url]: res[url]
+            })
+        })
+    }, false);
+    notes_content.appendChild(notes)
+    // console.log(content.notes.trim())
+    var display = content.notes.trim() == "" || content.notes.trim() == "Edit your note here..." ? "none" : "block"
+    notes_content.style.display = display
+
+    note_div.appendChild(notes_header)
+    note_div.appendChild(notes_content)
+
+    return note_div
 }
 
 function get_highlight(content, url, no_header = false) {
-    var res = ``
+
+    var highlight_div = document.createElement('div')
+
+    var highlight_header = document.createElement('div')
+    highlight_header.setAttribute("style", "margin-bottom:5px;")
+    highlight_header.innerHTML = "<strong>Highlights </strong>\n"
+
+    highlight_div.appendChild(highlight_header)
+
+    var highlight_context = document.createElement('div')
+    highlight_context.classList.add("d-flex")
+    highlight_context.classList.add("flex-wrap")
+
     content.highlighted.forEach((h, index) => {
-        res = res + (index + 1) + '. ' + h.text + `\n`
+        var highlight_text = document.createElement('div')
+        highlight_text.setAttribute("style", "white-space: pre-wrap;margin-bottom:10px;")
+        highlight_text.textContent = h.text
+        highlight_text.classList.add("highlighted_text")
+
+        highlight_text.addEventListener("click", function (event) {
+            var res = confirm("Delete this highlight?")
+            if (res) {
+                // note: template to remove somthing 
+                chrome.storage.local.get([url], function (res) {
+                    res[url].highlighted = res[url].highlighted.filter(x => x.text != h.text)
+                    chrome.storage.local.set({
+                        [url]: res[url]
+                    })
+                })
+                event.target.parentElement.removeChild(event.target)
+                // location.reload()
+            }
+
+        })
+        highlight_context.appendChild(highlight_text)
+
     })
 
-    var highlight = document.createElement('div')
-    var highlight_text = document.createElement('p')
-    if (no_header) {
-        highlight_text.innerHTML = res
-    } else {
-        highlight_text.innerHTML = "<strong>Highlighted: </strong>\n" + res
-    }
-    highlight.setAttribute("style", "white-space: pre-wrap;")
-    highlight.appendChild(highlight_text)
+    highlight_div.appendChild(highlight_context)
 
-    if (content.highlighted.length == 0) highlight = null
-
-    return highlight
+    return highlight_div
 }
 
 function get_figs(content, url) {
@@ -186,27 +299,7 @@ function get_figs(content, url) {
     figs.classList.add("d-flex")
     figs.classList.add("flex-wrap")
     content.saved_fig.forEach(f => {
-        var img_div = document.createElement("div")
-        img_div.setAttribute("style", "width:auto;text-align:center;")
-        var img = document.createElement("img")
-        var title = document.createElement("p")
-        title.classList.add("fig_caption")
-        title.setAttribute("style", "width:400px;text-align:center;")
-        title.textContent = f.title
-        img.src = f.src
-        img.addEventListener('click', open_img, false)
-
-        img_div.appendChild(img)
-        var width_height = "width:auto;height:200px;"
-        if (f.title[0] == "(" || f.title[0] == "{") {
-            width_height = "width:auto;height:50px;"
-        } else {
-            img_div.appendChild(title)
-        }
-        img.setAttribute("style", width_height + "cursor:pointer;")
-        img.classList.add("rounded")
-        img_div.classList.add("p-2")
-        figs.appendChild(img_div)
+        figs.appendChild(create_img_div(url, f))
     })
 
     if (content.saved_fig.length == 0) figs = null
@@ -215,6 +308,53 @@ function get_figs(content, url) {
 }
 
 
-function open_img() {
-    window.open(this.src)
+function open_img_modal(target) {
+    image_modal.style.display = "block";
+    // image_modal.style.visibility = "visible"
+    // image_modal.style.opacity = 1
+    document.getElementById("modal_img_content").src = target.src
+}
+
+function create_img_div(url, f, show_title = true) {
+    var img_div = document.createElement("div")
+    img_div.setAttribute("style", "width:auto;text-align:center;")
+    var img = document.createElement("img")
+
+    var title = document.createElement("p")
+    title.classList.add("fig_caption")
+    title.setAttribute("style", "width:auto;max-width:400px;text-align:center;margin-bottom:5px;")
+    title.textContent = f.title
+    img.src = f.src
+    img.addEventListener('mousedown', function (event) {
+        if (event.buttons == 1) {
+            open_img_modal(event.target)
+        } else if (event.buttons == 2) {
+
+            var res = confirm("Delete this image?")
+            if (res) {
+                // note: template to remove somthing 
+                chrome.storage.local.get([url], function (res) {
+                    res[url].saved_fig = res[url].saved_fig.filter(x => x.src != f.src)
+                    chrome.storage.local.set({
+                        [url]: res[url]
+                    })
+                })
+
+                event.target.parentElement.parentElement.removeChild(event.target.parentElement)
+                // location.reload()
+            }
+        }
+    })
+
+    img_div.appendChild(img)
+    var width_height = "width:auto;height:200px;"
+    if (f.title[0] == "(" || f.title[0] == "{" || f.title[0] == "/") {
+        width_height = "width:auto;height:50px;"
+    } else if (show_title) {
+        img_div.appendChild(title)
+    }
+    img.setAttribute("style", width_height + "cursor:pointer;")
+    img.classList.add("rounded")
+    img_div.classList.add("p-2")
+    return img_div
 }

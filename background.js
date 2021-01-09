@@ -24,6 +24,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                 })
             });
         });
+        sendResponse({
+            msg: "finished",
+            content: ""
+        });
     }
     if (request.msg == "open_all_wiki") {
         chrome.tabs.create({

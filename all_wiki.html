@@ -13,44 +13,51 @@
 </head>
 
 <body>
-    <header class="sticky d-flex">
+    <header class="sticky d-flex" id="app_header">
         <h1>Wiki Collector</h1>
         <div id="tool_buttons" style="margin-left:8px;" class="float-end">
-            <button id="list_all" class="btn" value="tree_view">
+            <button id="list_all" class="btn btn-sm" value="tree_view">
                 <i class="mdi mdi-format-list-bulleted" aria-hidden="true"></i>
             </button>
 
-            <button id="net_work" class="btn">
+            <button id="net_work" class="btn btn-sm">
                 <i class="mdi mdi-graph" aria-hidden="true"></i>
             </button>
 
-            <button id="show_notes" class="btn">
+            <button id="show_notes" class="btn btn-sm">
                 <i class="mdi mdi-notebook" aria-hidden="true"></i>
             </button>
 
-            <button id="show_figs" class="btn">
+            <button id="show_figs" class="btn btn-sm">
                 <i class="mdi mdi-image-multiple" aria-hidden="true"></i>
             </button>
 
-            <button id="upload_file" class="btn">
+            <button id="upload_file" class="btn btn-sm">
                 <i class="mdi mdi-file-upload-outline" aria-hidden="true"></i>
             </button>
 
-            <button id="export_file" class="btn">
+            <button id="export_file" class="btn btn-sm">
                 <i class="mdi mdi-export" aria-hidden="true"></i>
             </button>
+
+            <button id="app_setting" class="btn btn-sm">
+                <i class="mdi mdi-cog" aria-hidden="true"></i>
+            </button>
+            <!-- <svg width="50" height="240">
+                <circle cx="100" cy="100" fill="red" r="100"></circle>
+            </svg> -->
         </div>
     </header>
     <section>
 
-        <nav>
+        <nav style="padding:0px;">
             <ul id="collected_list">
                 <li class="nothing_text">Your collected enrty will go here...</li>
             </ul>
         </nav>
         <article id="article_container">
-            <div id="wiki_content"> 
-                <p class="nothing_text"> 
+            <div id="wiki_content">
+                <p class="nothing_text">
                     There is nothing to display...
                 </p>
             </div>
@@ -62,7 +69,10 @@
     </footer>
 
     <script src="wiki_all.js" charset="utf-8"></script>
+    <script src="wiki_all_ui.js" charset="utf-8"></script>
     <script src="utils.js" charset="utf-8"></script>
+    <script src="plot_d3.js" charset="utf-8"></script>
+    <script src="d3.min.js" charset="utf-8"></script>
 </body>
 
 </html>
