@@ -1,0 +1,99 @@
+.word_list {
+    text-align: right;
+    width:100px
+}
+
+.word_tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+    margin-right: 8px;
+}
+
+.word_tooltiptext {
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    padding-bottom: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.word_tooltip .word_tooltiptext {
+    visibility: hidden;
+    width: 400px;
+    background-color: rgba(0, 0, 0, 0.9);
+    color: #fff;
+    text-align: left;
+    border-radius: 5px;
+    padding: 5px 0px 10px 0px;
+
+    left: 105%;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 999;
+    top: -5px;
+    /* fade effect */
+    opacity: 0;
+}
+
+
+.word_tooltip:hover .word_tooltiptext {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.5s;
+}
+
+.word_content {
+    display: block;
+    width: auto;
+    padding: 5px 15px 0px 15px;
+    white-space: nowrap;
+}
+
+.word_pronounce {
+    cursor: pointer;
+}
+
+.word_pronounce_text {
+    font-size: 12px;
+    font-weight: 200;
+    cursor: pointer;
+}
+
+.partOfSpeech {
+    font-size: 12px;
+    font-weight: 200;
+    font-style: italic;
+    margin-bottom: 5px;
+}
+
+.word_definition {
+    color: rgb(255, 255, 255);
+    white-space: normal;
+    margin-bottom: 5px;
+}
+
+.word_example {
+    color: rgb(175, 175, 175);
+    font-weight: 200;
+    white-space: normal;
+}
+
+.word_synonyms {
+    white-space: normal;
+}
+
+
+.word_li {
+    margin-bottom: 5px;
+    margin-right: 5px;
+    padding-left: 25px;
+    font-size: 12px;
+    font-weight: 400;
+    width: auto;
+}
+
+.word_li li {
+    margin-bottom: 10px;
+}

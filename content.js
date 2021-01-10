@@ -51,6 +51,30 @@ document.addEventListener("keydown", function (zEvent) {
             update_storage(win_url, "notes")
         }
         pre_key = zEvent.key
+
+
+    }
+});
+
+document.addEventListener('click', function (event) {
+    if (event.altKey) {
+        var selection = window.getSelection()
+        // console.log(selection.toString().trim())
+        if (selection.toString().trim()!="") {
+            var span = document.createElement("span");
+            var word = selection.toString()
+            span.id = "search_word_dict" + word
+            span.classList.add("word_tooltip")
+            if (selection.rangeCount) {
+                var range = selection.getRangeAt(0).cloneRange();
+                range.surroundContents(span);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+            create_word_tooltip(word, span.id, true)
+
+            window.getSelection().empty()
+        }
     }
 });
 

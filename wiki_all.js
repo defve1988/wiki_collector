@@ -6,10 +6,11 @@ window.onload = function () {
     add_elements()
     document.getElementById('list_all').addEventListener('click', list_all, false)
     document.getElementById('net_work').addEventListener('click', net_work, false)
-    document.getElementById('show_notes').addEventListener('click', show_notes, false)
+    document.getElementById('show_notes').addEventListener('click', show_word_list, false)
     document.getElementById('show_figs').addEventListener('click', show_figs, false)
     document.getElementById('upload_file').addEventListener('click', upload_file, false)
     document.getElementById('export_file').addEventListener('click', export_file, false)
+
     document.getElementById('app_setting').addEventListener('click', app_setting, false)
     document.getElementById('app_setting').style.display = "none"
     list_all()
@@ -34,19 +35,142 @@ window.onload = function () {
     // todo: add some review functions, randomized list
 }
 
+function toggle_group(button_id, group_class="toggle_group"){
+    var group = [...document.getElementsByClassName(group_class)]
+    group.forEach(g=>{
+        g.classList.remove("btn_active")
+    })
+    document.getElementById(button_id).classList.add("btn_active")
+}
+
 function app_setting() {}
 
-function net_work() {
+function show_word_list() {
+    toggle_group("show_notes")
     clear_content()
-    
+    var collected_div = document.getElementById("article_container")
+
+    var btn_collection = document.createElement("div")
+    btn_collection.classList.add("wiki_content")
+
+    var btn_list_view = create_btn("mdi-view-headline")
+    btn_list_view.id = "btn_list_view"
+    btn_list_view.addEventListener("click", show_word_list_words)
+    var btn_card_view = create_btn("mdi-card-text-outline")
+    btn_card_view.id = "btn_card_view"
+    btn_card_view.addEventListener("click", show_word_list_cards)
+
+    btn_collection.appendChild(btn_list_view)
+    btn_collection.appendChild(btn_card_view)
+
+    collected_div.appendChild(btn_collection)
+    show_word_list_words()
+
+}
+
+function show_word_list_words() {
+    var word_list_div = document.getElementById("wiki_content_word_list")
+    // console.log(word_list_div)
+    if (word_list_div !=null){
+        word_list_div.parentElement.removeChild(word_list_div)
+    }
+
+    document.getElementById("btn_list_view").classList.add("btn_active")
+    document.getElementById("btn_card_view").classList.remove("btn_active")
+
+    chrome.storage.local.get(["word_list"], function (res) {
+        var collected_div = document.getElementById("article_container")
+        var gallery = document.createElement("div")
+        gallery.classList.add("wiki_content")
+        gallery.id = "wiki_content_word_list"
+
+        res.word_list.forEach(w => {
+            var word_line = document.createElement("div")
+            word_line.id = "word_line_" + w
+            word_line.setAttribute("style",
+                `width:150px;
+            text-align:right;
+            `)
+
+            var close_btn = document.createElement("i")
+            close_btn.classList.add("mdi")
+            close_btn.classList.add("mdi-delete-outline")
+            close_btn.setAttribute("style",
+                `font-size:14px; 
+                margin-right:5px;
+                cursor:pointer;
+                `)
+            close_btn.addEventListener("click", function () {
+                word_list_remove(w)
+                word_line.parentElement.removeChild(word_line)
+            })
+            word_line.appendChild(close_btn)
+
+            var word = document.createElement("div")
+            word_line.appendChild(word)
+            word.id = "word_list_" + w
+            word.classList.add("word_tooltip")
+            word.textContent = w
+            word.addEventListener("mouseenter", function () {
+                create_word_tooltip(w, word.id, false)
+            })
+            gallery.appendChild(word_line)
+        })
+        collected_div.appendChild(gallery)
+        res.word_list.forEach(w => {
+            create_word_tooltip(w, "word_list_" + w, false)
+        })
+    })
+}
+
+function show_word_list_cards() {
+    var word_list_div = document.getElementById("wiki_content_word_list")
+    // console.log(word_list_div)
+    if (word_list_div !=null){
+        word_list_div.parentElement.removeChild(word_list_div)
+    }
+
+    document.getElementById("btn_card_view").classList.add("btn_active")
+    document.getElementById("btn_list_view").classList.remove("btn_active")
+
+    chrome.storage.local.get(["word_list"], function (res) {
+        var collected_div = document.getElementById("article_container")
+        var gallery = document.createElement("div")
+        gallery.classList.add("wiki_content")
+        gallery.id = "wiki_content_word_list"
+
+
+        res.word_list.forEach(w => {
+            var word_line = document.createElement("div")
+            word_line.id = "word_line_" + w
+
+            var word = document.createElement("div")
+            word_line.appendChild(word)
+            word.id = "word_list_" + w
+            word.addEventListener("mouseenter", function () {
+                create_word_tooltip(w, word.id, false)
+            })
+            gallery.appendChild(word_line)
+        })
+        collected_div.appendChild(gallery)
+        res.word_list.forEach(w => {
+            create_word_tooltip(w, "word_list_" + w, false)
+        })
+    })
+}
+
+function net_work() {
+    toggle_group("net_work")
+    clear_content()
+
     var collected_div = document.getElementById("article_container")
     var svg_div = document.createElement("div")
     svg_div.classList.add("wiki_content")
     // svg_div.setAttribute("style","height:100px;width:1000px;")
-    
+
     var count_text = document.createElement("div")
     count_text.id = "total_collected"
-    
+
     var svg = document.createElement("svg")
     collected_div.appendChild(svg_div)
     svg.id = "network_svg"
@@ -62,40 +186,8 @@ function upload_file() {
     document.getElementById('file_selector').click();
 }
 
-function show_notes() {
-    chrome.storage.local.get(["collected_list"], function (res) {
-        if (res.collected_list.length > 0) {
-            var nothing_text = [...document.getElementsByClassName("nothing_text")]
-            nothing_text.forEach(e => {
-                e.parentNode.removeChild(e)
-            })
-            clear_content()
-        }
-        // console.log(res.collected_list)
-        res.collected_list.forEach(url => {
-            var collected_div = document.getElementById("article_container")
-            chrome.storage.local.get([url], function (res) {
-                var title = get_title(res[url], url)
-                var notes = get_notes(res[url], url, true)
-                var highlight = get_highlight(res[url], url, true)
-                var entry_div = document.createElement('div')
-                entry_div.classList.add("container-fluid")
-                entry_div.classList.add("wiki_content")
-                if (notes != null || highlight != null) {
-                    entry_div.appendChild(title)
-                    if (notes != null) entry_div.appendChild(notes)
-                    if (highlight != null) entry_div.appendChild(highlight)
-                    entry_div.appendChild(document.createElement("hr"))
-                }
-
-                entry_div.id = "entry_" + url
-                collected_div.appendChild(entry_div)
-            })
-        })
-    })
-}
-
 function show_figs() {
+    toggle_group("show_figs")
     chrome.storage.local.get(["collected_list"], function (res) {
         if (res.collected_list.length > 0) {
             var nothing_text = [...document.getElementsByClassName("nothing_text")]
@@ -124,12 +216,14 @@ function show_figs() {
 
 function clear_content() {
     var content = [...document.getElementsByClassName("wiki_content")]
+    // console.log(content)
     content.forEach(c => {
         c.parentNode.removeChild(c)
     })
 }
 
 function list_all() {
+    toggle_group("list_all")
     chrome.storage.local.get(["collected_list"], function (res) {
         if (res.collected_list.length > 0) {
             var nothing_text = [...document.getElementsByClassName("nothing_text")]
@@ -281,9 +375,7 @@ function get_highlight(content, url, no_header = false) {
                     })
                 })
                 event.target.parentElement.removeChild(event.target)
-                // location.reload()
             }
-
         })
         highlight_context.appendChild(highlight_text)
 
@@ -339,9 +431,7 @@ function create_img_div(url, f, show_title = true) {
                         [url]: res[url]
                     })
                 })
-
                 event.target.parentElement.parentElement.removeChild(event.target.parentElement)
-                // location.reload()
             }
         }
     })

@@ -30,7 +30,7 @@ function create_graph() {
                 }
 
                 if (index == result.collected_list.length - 1) {
-                    console.log(graph)
+                    // console.log(graph)
                     f = new force_graph('#network_svg', graph)
                     f.init()
                 }
@@ -102,7 +102,7 @@ class force_graph {
 
         }
 
-        console.log(nodes)
+        // console.log(nodes)
 
         return {
             links: links,
@@ -141,7 +141,7 @@ class force_graph {
 
     async set_scale() {
 
-        console.log(this.graph.min_node, this.max_size)
+        // console.log(this.graph.min_node, this.max_size)
         this.sizeScale = d3.scaleLinear()
             .domain([Math.log10(this.graph.min_node), Math.log10(this.graph.max_node)])
             .range([5, this.max_size]);
@@ -159,7 +159,7 @@ class force_graph {
     }
 
     async draw(nodes, links) {
-        console.log(nodes)
+        // console.log(nodes)
         this.svg.selectAll("g").remove()
         this.g = this.svg.append("g")
             .attr("class", "everything");
@@ -267,7 +267,6 @@ class force_graph {
                     })
                     .style("opacity", d => this.sizeScale(Math.log10(d.watched)) > this.height_text ? 1 : 0.4);
                 this.link.style("stroke", this.normal_color);
-                document.getElementById("report").innerText = ""
             })
             .on("mouseup", (event, d) => {
                 this.node.style("opacity", 1)

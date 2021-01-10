@@ -94,28 +94,3 @@ function get_page_details() {
 }
 
 
-function get_keywords(text, num = 10) {
-    var word_list = text.split(' ')
-    const regex = /[^0-9a-z]/gi;
-    word_list = word_list.map(x => x.toLocaleLowerCase().replace(regex, ""))
-    var word_count = {}
-    word_list.forEach(element => {
-        if (word_count[element] == undefined) word_count[element] = 1
-        else word_count[element]++
-    });
-
-    word_count = Object.keys(word_count).map((key) => {
-        var temp = {
-            key: key,
-            val: word_count[key]
-        };
-        return temp
-    });
-
-    word_count.sort((a, b) => (a.val > b.val) ? -1 : 1)
-    var res = []
-    word_count.forEach(w => {
-        if (!key_words_exclude.includes(w.key)) res.push(w.key)
-    })
-    return res.slice(0, num)
-}

@@ -27,6 +27,12 @@ button:hover {
     background-color: rgb(150, 150, 150);
 }
 
+.btn_active {
+    color: rgb(240, 240, 240);
+    background-color: rgb(150, 150, 150);
+}
+
+
 html {
     scroll-behavior: smooth;
 }
@@ -217,3 +223,13 @@ img:hover {
     filter: drop-shadow(0 0 0.1rem rgba(102, 102, 102, 0.7));
 
 } */
+
+.footer {
+    /* display: inline-block; */
+    font-weight: 200;
+    vertical-align: bottom;
+}
+
+.wiki_content{
+    margin-bottom: 10px;
+}

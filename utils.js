@@ -97,7 +97,8 @@ function highlight_text(selection = null) {
         selection.removeAllRanges();
         selection.addRange(range);
     }
-    console.log(res.range)
+    // console.log(res.range)
+    window.getSelection().empty()
 
     return res
 }
@@ -244,6 +245,7 @@ function export_file() {
     console.log(1)
     chrome.storage.local.get(["collected_list"], function (result) { // null implies all items
         // Convert object to a string.
+        result.collected_list.push("word_list")
         chrome.storage.local.get(result.collected_list, function (result) {
             var result = JSON.stringify(result, undefined, 4);
             // Save as file
@@ -272,7 +274,9 @@ function read_json_file(file) {
 function create_btn(mid_name) {
     var btn = document.createElement('button')
     btn.classList.add("btn")
+    btn.classList.add("m-1")
     btn.classList.add("btn-sm")
+    btn.classList.add("button")
     var icon = document.createElement("i")
     icon.classList.add("mdi")
     icon.classList.add(mid_name)
@@ -282,6 +286,23 @@ function create_btn(mid_name) {
     return btn
 }
 
+
+function word_list_add(word) {
+    chrome.storage.local.get(["word_list"], function (res) {
+        chrome.storage.local.set({
+            word_list: res.word_list.concat(word)
+        })
+    })
+}
+
+
+function word_list_remove(word) {
+    chrome.storage.local.get(["word_list"], function (res) {
+        chrome.storage.local.set({
+            word_list: res.word_list.filter(x => x != word)
+        })
+    })
+}
 
 // todo: 1. switch notebooks, 2. new words, 3. delete entries, 4. how to resume highlited text, 5. fix collect and update
 // note: 1. you need to add listener for element fucntion instead of set "onclick" attributes

@@ -3,6 +3,7 @@ chrome.runtime.onInstalled.addListener(function () {
     chrome.storage.local.set({
         opened_page: {},
         collected_list: [],
+        word_list: [],
     });
     chrome.storage.local.get(["opened_page", "collected_list"], function (res) {
         console.log('collected', res.collected_list)
